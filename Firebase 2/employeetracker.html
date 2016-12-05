@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+
+<head>
+
+<meta charset="UTF-8">
+<title>Employee Tracker</title>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+
+<!-- Bootstrap CDN-->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+<!-- Firebase Reference -->
+<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.16.0/moment.min.js"></script>
+<style>
+	.jumbotron h1{
+		color: white;
+	}
+	h2{
+		color:white;
+	}
+	.jumbotron{
+		background-color: black;
+	}
+
+</style>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="jumbotron">
+			        <h1 class="text-center">Employee Data Management</h1>
+			        <h2 class="text-center">A Comprehensive Directory of Employee Billable Hours</h2>
+			    </div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-primary">
+				  <div class="panel-heading">Current Employees</div>
+					  <div class="panel-body">
+					  	<table class="table">
+							<thead>
+								<th>
+									<p>Employee Name</p>
+								</th>
+								<th>
+									<p>Role</p>
+								</th>
+								<th>
+									<p>Start Date</p>
+								</th>
+								<th>
+									<p>Months Worked</p>
+								</th>
+								<th>
+									<p>Monthly Rate</p>
+								</th>
+								<th>
+									<p>Total Billed ($)</p>
+								</th>
+							</thead>
+							<tbody id="tableBody">
+								<tr id="employeeTable">
+									<td id="namePlace">
+										<p>Patrick Star</p>
+									</td>
+									<td id="rolePlace">
+										<p>Starfish</p>
+									</td>
+									<td id="startPlace">
+										<p>01/01/70</p>
+									</td>
+									<td id="monthPlace">
+										<p>9001</p>
+									</td>
+									<td id="ratePlace">
+										<p>1</p>
+									</td>
+									<td id="totalPlace">
+										<p>9001</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					  </div>
+				</div>	
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-primary">
+				  <div class="panel-heading">Add Employee</div>
+				  <div class="panel-body">
+				  	<form id="name-form">
+	                    <label for="employeeName">Employee Name</label><br>
+	                    <input type="text" id="employeeName" name="findingName" class="form-control">
+	                </form>
+	                <form id="role-form">
+	                    <label for="employeeRole">Role</label><br>
+	                    <input type="text" id="employeeRole" name="findingRole" class="form-control">
+	                </form>
+	                <form id="startdate-form">
+	                    <label for="employeeStart">Start Date (DD/MM/YY - ex: 01/01/90)</label><br>
+	                    <input type="text" id="employeeStart" name="findingStart" class="form-control">
+	                </form>
+	                <form id="monthlyrate-form">
+	                    <label for="employeeRate">Monthly Rate</label><br>
+	                    <input type="number" id="employeeRate" name="findingRate" class="form-control">
+	                </form>
+	                <br>
+	                <input id="submitbtn" type="submit" value="Submit">
+				  </div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script>
+console.log(moment().format("DD/MM/YY hh:mm A"));
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyDafg7qD7rfMGBo3abLRKkTbmFo0ZCnOXw",
+  authDomain: "project-apex-ce5b8.firebaseapp.com",
+  databaseURL: "https://project-apex-ce5b8.firebaseio.com",
+  storageBucket: "project-apex-ce5b8.appspot.com",
+  messagingSenderId: "74764218032"
+};
+
+firebase.initializeApp(config);
+
+// Create a variable to reference the database.
+var database = firebase.database();
+database.ref("/employeeTracker");
+var empName = "";
+var empRole = "";
+var empStart = "";
+var empRate = 0;
+var newDate = ""; 
+$("#submitbtn").on("click", function(){
+	empName = $("#employeeName").val().trim();
+	empRole = $("#employeeRole").val().trim();
+	empStart = $("#employeeStart").val().trim();
+	empRate = $("#employeeRate").val().trim();
+
+	database.ref("/employeeTracker").push({
+        name: empName,
+        role: empRole,
+        start: empStart,
+        rate: empRate,
+        dataAdded: firebase.database.ServerValue.TIMESTAMP
+      });
+
+	$("#employeeName").val("");
+	$("#employeeRole").val("");
+	$("#employeeStart").val("");
+	$("#employeeRate").val("");
+	return false;
+});
+database.ref("/employeeTracker").orderByChild("dateAdded").limitToLast(1).on("child_added", function(childSnapshot) {
+      // Log everything that's coming out of snapshot
+      newDate = moment().diff(moment(childSnapshot.val().start, "MM-DD-YYYY"), "months");
+		console.log(newDate);
+      console.log(childSnapshot.val());
+      console.log(childSnapshot.val().name);
+      console.log(childSnapshot.val().role);
+      console.log(childSnapshot.val().start);
+      console.log(childSnapshot.val().rate);
+      console.log(moment(newDate, "MM").fromNow());
+      console.log(moment(newDate).diff(moment()));
+      var nameInfo = $("<p>" + childSnapshot.val().name + "</p>");
+      $("#namePlace").append(nameInfo);
+      var roleInfo = $("<p>" + childSnapshot.val().role + "</p>");
+      $("#rolePlace").append(roleInfo);
+      var startInfo = $("<p>" + childSnapshot.val().start + "</p>");
+      $("#startPlace").append(startInfo);
+      var monthInfo = $("<p>" + newDate + "</p>");
+      $("#monthPlace").append(monthInfo);
+      var rateInfo = $("<p>" + childSnapshot.val().rate + "</p>");
+      $("#ratePlace").append(rateInfo);
+      var totalInfo = $("<p>" + newDate*childSnapshot.val().rate + "</p>");
+      $("#totalPlace").append(totalInfo);
+      $("#employeeTable").append($("#namePlace"));
+      $("#employeeTable").append($("#rolePlace"));
+      $("#employeeTable").append($("#startPlace"));
+      $("#employeeTable").append($("#monthPlace"));
+      $("#employeeTable").append($("#ratePlace"));
+      $("#employeeTable").append($("#totalPlace"));
+      $("#tableBody").append($("employeeTable"));
+    // Handle the errors
+    }, function(errorObject) {
+      console.log("Errors handled: " + errorObject.code);
+});
+</script>
+</body>
+</html>

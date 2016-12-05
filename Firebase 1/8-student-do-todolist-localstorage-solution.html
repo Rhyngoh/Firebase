@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+
+  <head>
+
+    <meta charset="UTF-8">
+    <title>To Do App!</title>
+
+  </head>
+
+  <body>
+
+    <!-- Title -->
+    <h1>My To Dos!</h1>
+
+    <!-- Input Form -->
+    <form>
+      <h2>To Do Item: 
+        <input id="to-do" type="text">
+        <input id="add-to-do" value="Add Item" type="submit">
+      </h2>
+    </form>
+
+    <hr>
+
+    <!-- To-Do List -->
+    <div id="to-dos"></div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+
+    <!-- Script -->
+    <script>
+
+    // Create an initial toDoCount variable
+    var toDoCount = 0;
+
+    // Created an array to hold todos created by the user
+    var toDoArray = [];
+
+    // On Click event associated with the add-tp-do function
+    $("#add-to-do").on("click", function() {
+
+      // Get the to-do "value" from the textbox
+      var toDoTask = $("#to-do").val().trim();
+
+      // Create a new variable that will hold a "<p>" tag.
+      // Then give it an ID in the following form:
+      // "item-4" or "item-3" or "item-99", where the number is equal to toDoCount.
+      // Then append the to-do "value" as text to this <p> element.
+      var toDoItem = $("<p>");
+
+      toDoItem.attr("id", "item-" + toDoCount);
+      toDoItem.append(" " + toDoTask);
+
+      // Create a button with unique identifiers based on what number it is in the list. Again use jQuery to do this.
+      // Give our button a data attribute called data-to-do and a class called "checkbox".
+      // Lastly append the letter X inside.
+      var toDoClose = $("<button>");
+
+      toDoClose.attr("data-to-do", toDoCount);
+      toDoClose.addClass("checkbox");
+      toDoClose.append("X");
+
+      // -------------------------------------------------------------------------
+
+      // Added the toDo task to the array in text format.
+      toDoArray.push(toDoTask);
+      console.log(toDoArray);
+
+      // Emptied the localStorage
+      localStorage.clear();
+
+      // Converted the array into localStorage
+      localStorage.setItem("to-dos", JSON.stringify(toDoArray));
+
+      // -------------------------------------------------------------------------
+
+      // Append the button to the to do item
+      toDoItem = toDoItem.prepend(toDoClose);
+
+      // Add the button and todo item to the to-dos div
+      $("#to-dos").append(toDoItem);
+
+      // Clear the textbox when done
+      $("#to-do").val("");
+
+      // Add to the todoCount
+      toDoCount++;
+
+      // Prevent Form from Refreshing (return false)
+      return false;
+    });
+
+    // When a user clicks a check box then delete the specific content
+    // (NOTE: Pay attention to the unusual syntax here for the click event.
+    // Because we are creating click events on "dynamic" content, we can't just use the usual "on" "click" syntax.)
+    $(document.body).on("click", ".checkbox", function() {
+
+      // Get the toDoNumber of the button from its data attribute.
+      var toDoNumber = $(this).data("to-do");
+
+      // Empty the specific <p> element that previously held the todo item.
+      $("#item-" + toDoNumber).empty();
+
+      // Deletes that same index from the array of toDos (to keep things matching)
+      toDoArray.splice(toDoNumber, 1);
+
+      // Console log the values to confirm we have the right input
+      console.log(toDoNumber);
+      console.log(toDoArray);
+
+      // Emptied the localStorage
+      localStorage.clear();
+
+      // Converted the array into localStorage
+      localStorage.setItem("to-dos", JSON.stringify(toDoArray));
+    });
+
+    // --------------------------------------------------------------------------------------------------------
+
+    // Reset the toDoCount
+    toDoCount = 0;
+
+    // By default take the localStorage content, convert it to an array,
+    // and then use a for-loop to re-create the todolist
+    $("#to-dos").empty();
+
+    // If Data exists inside of localStorage then loop through and display it.
+    if (JSON.parse(localStorage.getItem("to-dos"))) {
+
+      var storedToDos = JSON.parse(localStorage.getItem("to-dos"));
+
+      // Sets the global toDoArray variable equal to the storedToDos
+      toDoArray = storedToDos;
+      console.log(storedToDos);
+
+      for (var i = 0; i < storedToDos.length; i++) {
+
+        // Get the Todo "value" from the textbox
+        var toDoTask = storedToDos[toDoCount];
+        console.log(toDoTask);
+
+        // Create a new todo <p> tag in jQuery  to hold a toDoItem
+        // and give it a unique identifier based on what number it is in the list.
+        // Then give it an ID of the form: "item-4" or "item-3" or "item-99", where the number is equal to toDoCount.
+        // Then append the todo text to this <p> element.
+        var toDoItem = $("<p>");
+
+        toDoItem.attr("id", "item-" + toDoCount);
+        toDoItem.append(" " + toDoTask);
+
+        // Create a button with unique identifiers based on what number it is in the list. Again use jQuery to do this.
+        // Give our button a data attribute called data-to-do and a class called "checkbox".
+        // Lastly append a letter X inside.
+        var toDoClose = $("<button>");
+
+        toDoClose.attr("data-to-do", toDoCount);
+        toDoClose.addClass("checkbox");
+        toDoClose.append("X");
+
+        // Append the button to the todoitem
+        toDoItem = toDoItem.prepend(toDoClose);
+
+        // Add the button and toDoItem to the to-dos div
+        $("#to-dos").append(toDoItem);
+        toDoCount++;
+      }
+    }
+
+    </script>
+
+  </body>
+
+</html>

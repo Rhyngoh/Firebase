@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+
+  <head>
+
+    <meta charset="UTF-8">
+    <title>To Do App!</title>
+
+  </head>
+
+  <body>
+
+    <!-- Title -->
+    <h1>My To Do's!</h1>
+
+    <!-- Input Form -->
+    <form>
+      <h2>To Do Item: <input id="to-do" type="text" ><input id="add-to-do" value="Add Item" type="submit"></h2>
+    </form>
+
+    <hr>
+
+    <!-- To-Do List -->
+    <div id="to-dos"></div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+
+    <!-- Script -->
+    <script>
+
+    //  ============================= START CODING BELOW! =============================================
+
+    // Create an initial toDoCount variable
+
+    var toDoCount = 0;
+    var toDoArray = [];
+    //  On Click event associated with the add-to-do function
+    $("#add-to-do").on("click", function() {
+
+      // Get the to-do "value" from the textbox and store it a variable
+
+    var varValue = $("#to-do").val().trim();
+    
+      // Create a new variable that will hold a "<p>" tag.
+    var todoP = $("<p>");
+      
+      // Then give it an ID in the following form:
+
+    $(todoP).attr("id", "item-" + toDoCount);
+
+      // "item-4" or "item-3" or "item-99", where the number is equal to toDoCount.
+
+    $(todoP).append(" " + varValue);
+
+      // Then append the to-do "value" as text to this <p> element.
+
+      var button1 = $("<button>");
+     // $("#to-dos").append(button1);
+      //$(button1).attr("id", "item-" + varValue);
+
+      // Create a button with unique identifiers based on what number it is in the list. Again use jQuery to do this.
+
+      $(button1).attr("data-to-do", toDoCount);
+
+      // Give your button a data attribute called data-to-do and a class called "checkbox".
+
+      $(button1).addClass("checkbox");
+      // Lastly append the letter X inside.
+      $(button1).append("X");
+      // Append the button to the to do item
+
+      toDoArray.push(varValue);
+      localStorage.clear();
+      localStorage.setItem("to-dos", JSON.stringify(toDoArray));
+      todoP = $(todoP).prepend(button1);
+
+      // Add the button and toDoItem to the to-dos div
+      $("#to-dos").append(todoP);
+
+      // Clear the textbox when done
+      $("#to-do").val("");
+
+      // Add to the toDoCount
+      toDoCount++;
+
+      // Prevent Form from refreshing (return false)
+      return false;
+
+    });
+    
+    //  When a user clicks a check box then delete the specific content
+    //  (NOTE: Pay attention to the unusual syntax here for the click event.
+    //  Because we are creating click events on "dynamic" content, we can't just use the usual "on" "click" syntax.)
+    $(document.body).on("click", ".checkbox", function() {
+
+      // Get the number of the button from its data attribute and hold in a variable called  toDoNumber.
+      var toDoNumber = $(this).data("to-do");
+
+      // Select and Empty the specific <p> element that previously held the to do item number.
+      $("#item-" + toDoNumber).empty();
+      toDoArray.splice(toDoNumber, 1);
+
+      localStorage.clear();
+      localStorage.setItem("to-dos", JSON.stringify(toDoArray));
+    });
+    toDoCount = 0;
+    $("#to-dos").empty();
+    if(JSON.parse(localStorage.getItem("to-dos"))){
+      var storedToDos = JSON.parse(localStorage.getItem("to-dos"));
+      toDoArray = storedToDos;
+
+      for (var i = 0; i < storedToDos.length; i++){
+        var toDoTask = storedToDos[toDoCount];
+        var toDoItem = $("<p>");
+        toDoItem.attr("id", "item-" + toDoCount);
+        toDoItem.append(" " + toDoTask);
+        var button1 = $("<button>");
+        $(button1).attr("data-to-do", toDoCount);
+        $(button1).addClass("checkbox");
+        $(button1).append("X");
+        toDoItem = toDoItem.prepend(button1);
+        toDoCount++;
+      }
+    }
+
+    </script>
+
+  </body>
+
+</html>
